@@ -1,12 +1,14 @@
 package model.dao;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.List;
 import modelEntities.seller;
 
-public class sellerDao {
-    void insert(seller obj);
-    void update(seller obj);
-    void deleteById(Integer id);
-    seller findById(Integer id);
+public interface sellerDao {
+    public void insert(seller obj);
+    public void update(seller obj);
+    public void deleteById(Integer id);
+    public seller findById(Integer id);
     List<seller> findAll();
 }
