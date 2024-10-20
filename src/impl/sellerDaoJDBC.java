@@ -9,7 +9,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class sellerDaoJDBC implements sellerDao{
     private Connection conn;
@@ -50,6 +53,52 @@ public class sellerDaoJDBC implements sellerDao{
         }
     }
 
+    @Override
+    public List<seller> findAll() {
+        return null;
+    }
+
+    @Override
+    public List<seller> findByDepartment(department department) {
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        try{
+            st=conn.prepareStatement(
+                   "SELECT seller.*,department.Name as DepName " +
+                           "FROM seller INNER JOIN department "+
+                           "ON seller.DepartmentId = department.Id "+
+                           "WHERE DepartmentId = ? " +
+                           "ORDER BY Name");
+
+            st.setInt(1, department.getId());
+            rs = st.executeQuery();
+
+            List<seller> list = new ArrayList<>();
+            Map<Integer, department> map = new HashMap<>();
+
+            //Essa instanciação faz com que o a variável obtenha o ID do departamento, após isso, testa
+            //Caso a variável esteja vazia, ele salva o ID no map, evitando a repetição de vários ID.
+            //Gerando um resultado correto na memória do computador.
+            while(rs.next()){
+                department dep = map.get(rs.getInt("departmentId"));
+                if(dep == null){
+                    dep = instanciateDepartment(rs);
+                    map.put(rs.getInt("departmentId"), dep);
+                }
+                seller obj = instanciateSeller(rs, dep);
+                list.add(obj);
+            }
+            return list;
+        }catch(SQLException e){
+            throw new DbException(e.getMessage());
+        }
+        finally {
+            DB.closeStatement(st);
+            DB.closeResultSet(rs);
+        }
+    }
+
+
     private seller instanciateSeller(ResultSet rs, department dep) throws SQLException{
         seller obj = new seller();
         obj.setId(rs.getInt("Id"));
@@ -68,10 +117,7 @@ public class sellerDaoJDBC implements sellerDao{
         return dep;
     }
 
-    @Override
-    public List<seller> findAll() {
-        return null;
-    }
+
 
 
 }
