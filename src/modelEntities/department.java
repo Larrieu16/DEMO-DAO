@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class department implements Serializable {
-    private Integer id;
+    private static Integer id;
     private String name;
 
     public department(){
